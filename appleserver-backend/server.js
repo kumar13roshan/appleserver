@@ -114,33 +114,44 @@ app.post('/generate', async (req, res) => {
 
     console.log(`🔑 Trying API Key ${currentKeyIndex + 1}/${keys.length} (${maskedKey})`);
 
-    try {
-      const genAI = new GoogleGenerativeAI(currentKey);
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-        systemInstruction: 'You are a professional software scaffolding assistant. Based on the user\'s prompt, generate a fully functional codebase structure. Return the relative paths and contents for all necessary files in the project. The content of each file MUST be formatted beautifully with proper indentation, standard spacing, and clear newlines (\\n). DO NOT minify the code or output it in a single line. Strictly adhere to the requested JSON response schema.'
-      });
+    const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    let keySuccess = false;
 
-      const result = await model.generateContent({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          responseSchema: responseSchema,
-        }
-      });
+    for (const modelName of modelsToTry) {
+      try {
+        console.log(`🤖 Trying model ${modelName} with Key ${currentKeyIndex + 1}...`);
+        const genAI = new GoogleGenerativeAI(currentKey);
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: 'You are a professional software scaffolding assistant. Based on the user\'s prompt, generate a fully functional codebase structure. Return the relative paths and contents for all necessary files in the project. The content of each file MUST be formatted beautifully with proper indentation, standard spacing, and clear newlines (\\n). DO NOT minify the code or output it in a single line. Strictly adhere to the requested JSON response schema.'
+        });
 
-      const text = result.response.text();
-      const data = JSON.parse(text);
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema: responseSchema,
+          }
+        });
 
-      console.log(`✅ Successfully generated ${data.files ? data.files.length : 0} files using Key ${currentKeyIndex + 1}.`);
-      res.json(data);
-      success = true;
-      break; // Exit the loop on success
+        const text = result.response.text();
+        const data = JSON.parse(text);
 
-    } catch (error) {
-      console.error(`❌ API Key ${currentKeyIndex + 1} Failed:`, error.message || error);
-      lastError = error;
-      // Loop continues, attempting fallback to the next available API Key
+        console.log(`✅ Successfully generated ${data.files ? data.files.length : 0} files using Key ${currentKeyIndex + 1} and model ${modelName}.`);
+        res.json(data);
+        success = true;
+        keySuccess = true;
+        break; // Exit the model loop on success
+
+      } catch (error) {
+        console.error(`⚠️ Model ${modelName} failed with Key ${currentKeyIndex + 1}:`, error.message || error);
+        lastError = error;
+        // Try the next model
+      }
+    }
+
+    if (keySuccess) {
+      break; // Exit the key loop on success
     }
   }
 
