@@ -142,7 +142,19 @@ async function main() {
 
     // Write each file
     for (const file of data.files) {
-      const filePath = path.join(targetDir, file.path);
+      if (!file.path || typeof file.path !== 'string') {
+        continue;
+      }
+
+      const filePath = path.resolve(targetDir, file.path);
+
+      // Security check: Prevent path traversal (arbitrary file write outside target directory)
+      const relative = path.relative(targetDir, filePath);
+      if (relative.startsWith('..') || path.isAbsolute(relative)) {
+        console.warn(pc.yellow(`   ⚠️ Warning: Blocked path traversal attempt for: "${file.path}"`));
+        continue;
+      }
+
       const fileDir = path.dirname(filePath);
 
       // Create directories leading to file recursively
@@ -150,7 +162,7 @@ async function main() {
         fs.mkdirSync(fileDir, { recursive: true });
       }
 
-      fs.writeFileSync(filePath, file.content, 'utf8');
+      fs.writeFileSync(filePath, file.content || '', 'utf8');
       console.log(`   📄 Created: ${pc.cyan(file.path)}`);
     }
 
