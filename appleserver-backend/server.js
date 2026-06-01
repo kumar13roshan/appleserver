@@ -24,7 +24,7 @@ const responseSchema = {
           },
           content: { 
             type: 'string', 
-            description: 'The full source code content for this file.' 
+            description: 'The full, beautifully formatted, multi-line source code content for this file. Must contain actual newline characters (\\n) and proper indentation. Do NOT return the code as a single line or minified.' 
           }
         },
         required: ['path', 'content']
@@ -123,7 +123,7 @@ app.post('/generate', async (req, res) => {
         const genAI = new GoogleGenerativeAI(currentKey);
         const model = genAI.getGenerativeModel({
           model: modelName,
-          systemInstruction: 'You are a professional software scaffolding assistant. Based on the user\'s prompt, generate a fully functional, high-quality codebase structure. Return the relative paths and contents for all necessary files in the project. To prevent gateway timeouts, write clean, highly concise, and modular code. Avoid bloated comments, redundant code, or excessively large boilerplate files. Focus on the core functionality so that the response generates quickly and stays within size limits. The content of each file MUST be formatted beautifully with proper indentation, standard spacing, and clear newlines (\\n). DO NOT minify the code. Strictly adhere to the requested JSON response schema.'
+          systemInstruction: 'You are a professional software scaffolding assistant. Based on the user\'s prompt, generate a fully functional, high-quality codebase structure. Return the relative paths and contents for all necessary files in the project. To prevent gateway timeouts, write clean, highly concise, and modular code. Avoid bloated comments, redundant code, or excessively large boilerplate files. Focus on the core functionality so that the response generates quickly and stays within size limits. The content of each file MUST be formatted beautifully with standard multi-line formatting, proper indentation, and actual newline characters (\\n) between statements. Under no circumstances should the code for a file be minified or squashed onto a single line. Strictly adhere to the requested JSON response schema.'
         });
 
         const result = await model.generateContent({
