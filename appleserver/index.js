@@ -80,10 +80,9 @@ program
 const prompt = program.args[0];
 const options = program.opts();
 const targetDir = path.resolve(options.dir);
-
 // Backend server URLs
 const LOCAL_BACKEND_URL = 'http://localhost:3000/generate';
-const VERCEL_BACKEND_URL = 'https://appleserver.vercel.app/generate';
+const CLOUD_BACKEND_URL = 'https://appleserver.onrender.com/generate';
 
 // Helper to quickly check if a local backend is running
 async function checkLocalServer() {
@@ -109,16 +108,16 @@ async function checkLocalServer() {
 }
 
 async function main() {
-  let backendUrl = VERCEL_BACKEND_URL;
+  let backendUrl = CLOUD_BACKEND_URL;
   console.log(pc.red('\n🍎 Connecting to AppleServer...'));
 
   try {
     const isLocalRunning = await checkLocalServer();
     if (isLocalRunning) {
       backendUrl = LOCAL_BACKEND_URL;
-      console.log(pc.yellow('⚡ Local backend server detected! Routing request locally (no Vercel timeout limits).'));
+      console.log(pc.yellow('⚡ Local backend server detected! Routing request locally (no time limits).'));
     } else {
-      console.log(pc.red('🌐 Routing request to Vercel live server...'));
+      console.log(pc.red('🌐 Routing request to Render live server...'));
     }
 
     const response = await postData(backendUrl, { prompt });
