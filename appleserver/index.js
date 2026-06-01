@@ -82,7 +82,7 @@ const options = program.opts();
 const targetDir = path.resolve(options.dir);
 // Backend server URLs
 const LOCAL_BACKEND_URL = 'http://localhost:3000/generate';
-const CLOUD_BACKEND_URL = 'https://appleserver.onrender.com/generate';
+const CLOUD_BACKEND_URL = 'https://appleserver-ioog.onrender.com/generate';
 
 // Helper to quickly check if a local backend is running
 async function checkLocalServer() {
