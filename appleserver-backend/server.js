@@ -123,7 +123,7 @@ app.post('/generate', async (req, res) => {
         const genAI = new GoogleGenerativeAI(currentKey);
         const model = genAI.getGenerativeModel({
           model: modelName,
-          systemInstruction: 'You are a professional software scaffolding assistant. Based on the user\'s prompt, generate a fully functional codebase structure. Return the relative paths and contents for all necessary files in the project. The content of each file MUST be formatted beautifully with proper indentation, standard spacing, and clear newlines (\\n). DO NOT minify the code or output it in a single line. Strictly adhere to the requested JSON response schema.'
+          systemInstruction: 'You are a professional software scaffolding assistant. Based on the user\'s prompt, generate a fully functional, high-quality codebase structure. Return the relative paths and contents for all necessary files in the project. To prevent gateway timeouts, write clean, highly concise, and modular code. Avoid bloated comments, redundant code, or excessively large boilerplate files. Focus on the core functionality so that the response generates quickly and stays within size limits. The content of each file MUST be formatted beautifully with proper indentation, standard spacing, and clear newlines (\\n). DO NOT minify the code. Strictly adhere to the requested JSON response schema.'
         });
 
         const result = await model.generateContent({
