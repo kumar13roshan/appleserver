@@ -114,7 +114,7 @@ app.post('/generate', async (req, res) => {
 
     console.log(`🔑 Trying API Key ${currentKeyIndex + 1}/${keys.length} (${maskedKey})`);
 
-    const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
     let keySuccess = false;
 
     for (const modelName of modelsToTry) {
